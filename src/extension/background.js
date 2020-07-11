@@ -216,16 +216,26 @@ chrome.runtime.onMessage.addListener((request, sender) => {
       chrome.tabs.executeScript(tabId, {
         code: `
         // Function will attach script to the dom 
-        const injectScript = (file, tag) => {
+        const __injectReactimeScript = (file, tag) => {
           const htmlBody = document.getElementsByTagName(tag)[0];
           const script = document.createElement('script');
           script.setAttribute('type', 'text/javascript');
           script.setAttribute('src', file);
           htmlBody.appendChild(script);
         };
-        injectScript(chrome.runtime.getURL('bundles/backend.bundle.js'), 'body');
+        const __removeReactimeScript = el => {
+          el.remove();
+        }
+        let __reactime__ = __injectReactimeScript(chrome.runtime.getURL('bundles/backend.bundle.js'), 'body');
       `,
       });
+      break;
+    }
+    case 'removeScript': {
+      chrome.tabs.executeScript(tabId, {
+        code: '__removeReactimeScript(__reactime__);',
+      });
+      console.log('Stopping Reactime on tab:', tabId);
       break;
     }
     case 'tabReload': {

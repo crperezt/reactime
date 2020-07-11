@@ -1,12 +1,12 @@
-// import 'core-js';
+import '../backend/core-js';
 // const reactimeBackend = require('../../dev-reactime/index.js');
 
 let firstMessage = true;
 
 // listening for messages from npm package
-window.addEventListener('message', msg => { // runs automatically every second
+window.addEventListener('message', msg => {
   // window listener picks up the message it sends, so we should filter
-  // messages sent by contentscrip
+  // messages sent by contentscript
   if (firstMessage) {
     // tell the background script that the tab has reloaded
     chrome.runtime.sendMessage({ action: 'tabReload' });
@@ -40,4 +40,5 @@ chrome.runtime.onMessage.addListener(request => { // seems to never fire
   return true; // attempt to fix port closing console error
 });
 
+console.log('window is:', window); 
 chrome.runtime.sendMessage({ action: 'injectScript' });
