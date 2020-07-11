@@ -2,8 +2,8 @@
 /* eslint-disable no-inner-declarations, no-loop-func */
 // eslint-disable-next-line import/newline-after-import
 // import 'core-js';
-const acorn = require('./acorn');
-const jsx = require('./acorn-jsx');
+const acorn = require('acorn');
+const jsx = require('acorn-jsx');
 // import { acorn } from 'acorn'; // javascript parser
 // import { jsx } from 'acorn-jsx';
 
@@ -95,4 +95,9 @@ export const getHooksNames = elementType => {
     });
   }
   return Object.values(hooksNames);
+};
+
+// This returns the 'hidden' property type for the browser
+export const setHiddenType = () => {
+
 };

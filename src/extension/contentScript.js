@@ -1,4 +1,4 @@
-import '../backend/core-js';
+//import '../backend/core-js';
 // const reactimeBackend = require('../../dev-reactime/index.js');
 
 let firstMessage = true;

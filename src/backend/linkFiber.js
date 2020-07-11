@@ -1,4 +1,4 @@
-import './core-js';
+import 'core-js';
 /* eslint-disable indent */
 /* eslint-disable brace-style */
 /* eslint-disable comma-dangle */
@@ -36,22 +36,23 @@ import './core-js';
 
 // const Tree = require('./tree').default;
 // const componentActionsRecord = require('./masterState');
-import acorn from './acorn'; // javascript parser
-import jsx from './acorn-jsx';
+//import acorn from './acorn'; // javascript parser
+//import jsx from './acorn-jsx';
 import Tree from './tree';
 import componentActionsRecord from './masterState';
-
 import { throttle, getHooksNames } from './helpers';
 
-const DEBUG_MODE = true;
+let doWork = true;
 
-const alwaysLog = console.log;
+// const DEBUG_MODE = false;
 
-console.log = (original => { 
-  return (...args) => {
-    if (DEBUG_MODE) original(...args);
-  }
-})(console.log);
+// const alwaysLog = console.log;
+
+// console.log = (original => { 
+//   return (...args) => {
+//     if (DEBUG_MODE) original(...args);
+//   }
+// })(console.log);
 
 
 const circularComponentTable = new Set();
@@ -149,7 +150,7 @@ export default (snap, mode) => {
         // which includes the dispatch() function we use to change their state.
         const hooksStates = traverseHooks(memoizedState);
         const hooksNames = getHooksNames(elementType.toString());
-        console.log('hooks names:', hooksNames);
+        // console.log('hooks names:', hooksNames);
         hooksStates.forEach((state, i) => {
           hooksIndex = componentActionsRecord.saveNew(state.state, state.component);
           if (newState && newState.hooksState) {
@@ -160,7 +161,7 @@ export default (snap, mode) => {
             newState = { hooksState: [{ [hooksNames[i]]: state.state }, hooksIndex] };
           }
           componentFound = true;
-          console.log('currentFiber of hooks state:', currentFiber);
+          // console.log('currentFiber of hooks state:', currentFiber);
         });
       }
     }
@@ -211,11 +212,11 @@ export default (snap, mode) => {
     }
 
     if (circularComponentTable.has(child)) {
-      console.log('found circular child, exiting tree loop');
+      // console.log('found circular child, exiting tree loop');
     }
 
     if (circularComponentTable.has(sibling)) {
-      console.log('found circular sibling, exiting tree loop');
+      // console.log('found circular sibling, exiting tree loop');
     }
 
     return tree;
@@ -228,6 +229,11 @@ export default (snap, mode) => {
       snap.tree = createTree(current);
     }
     sendSnapshot();
+  }
+
+  function handleVisibilityChange() {
+    doWork = !document.hidden;
+    console.log('setting doWork to:', doWork);
   }
 
   return async () => {    
@@ -247,19 +253,22 @@ export default (snap, mode) => {
     const reactInstance = devTools ? devTools.renderers.get(1) : null;
     fiberRoot = devTools.getFiberRoots(1).values().next().value;
     const throttledUpdateSnapshot = throttle(updateSnapShotTree, 250);
-    
-    console.log('fiberRoot:', fiberRoot);
+    // console.log('fiberRoot:', fiberRoot);
+
+    // Add handler to stop gathering data when window is out of focus
+    document.addEventListener('visibilitychange', handleVisibilityChange, false);
+
     if (reactInstance && reactInstance.version) {
       devTools.onCommitFiberRoot = (function (original) {
         return function (...args) {
           fiberRoot = args[1];
-          throttledUpdateSnapshot();
+          if (doWork) throttledUpdateSnapshot();
           return original(...args);
         };
       }(devTools.onCommitFiberRoot));
     }
 
-    throttledUpdateSnapshot();
+    if (doWork) throttledUpdateSnapshot();
 
     // updateSnapShotTree();
     // Send the initial snapshot once the content script has started up
