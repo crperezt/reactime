@@ -3,7 +3,7 @@ import 'core-js';
 /* eslint-disable max-classes-per-file */
 /* eslint-disable no-console */
 /* eslint-disable no-param-reassign */
-// import * as reactWorkTags from './reactWorkTags';
+// import * as reactWorkTags from './reactWorkTags';`
 
 let copyInstances = 0;
 const circularComponentTable = new Set();
